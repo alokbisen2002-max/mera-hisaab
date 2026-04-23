@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#FF6B00"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="मेरा हिसाब"/>
+<title>मेरा हिसाब 🔒</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+body{background:#FFF8F0;font-family:'Noto Sans Devanagari','Segoe UI',sans-serif;color:#1C1917;overscroll-behavior:none}
+button,input,select,textarea{font-family:'Noto Sans Devanagari','Segoe UI',sans-serif}
+#splash{position:fixed;inset:0;background:linear-gradient(160deg,#FF6B00,#CC4400);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.sp-logo{font-size:64px;animation:pop .4s}
+@keyframes pop{0%{transform:scale(.5)}100%{transform:scale(1)}}
+.sp-title{color:#fff;font-size:30px;font-family:Georgia,serif}
+.sp-sub{color:#FFE4C4;font-size:14px}
+.spin{width:32px;height:32px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .8s linear infinite;margin-top:16px}
+@keyframes sp{to{transform:rotate(360deg)}}
+#login-screen{position:fixed;inset:0;background:linear-gradient(160deg,#FF6B00,#CC4400);z-index:998;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-y:auto}
+.login-box{background:rgba(255,255,255,.15);border-radius:20px;padding:20px;width:100%;max-width:340px}
+.login-tabs{display:flex;gap:0;margin-bottom:16px;background:rgba(0,0,0,.15);border-radius:12px;padding:3px}
+.login-tab{flex:1;padding:8px 0;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;color:rgba(255,255,255,.7);background:transparent;transition:.2s}
+.login-tab.on{background:#fff;color:#FF6B00}
+.linput{width:100%;border:none;border-radius:12px;padding:12px 14px;font-size:15px;color:#1C1917;background:#fff;outline:none;margin-bottom:10px}
+.login-btn{width:100%;background:#1C1917;color:#fff;border:none;border-radius:12px;padding:13px;font-size:16px;font-weight:700;cursor:pointer;margin-top:4px}
+.login-err{color:#FFD0D0;font-size:13px;text-align:center;margin-top:8px;min-height:18px}
+#pin-screen{position:fixed;inset:0;background:linear-gradient(160deg,#FF6B00,#CC4400);z-index:997;display:none;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px}
+.pin-sub{color:#FFE4C4;font-size:13px;margin-bottom:28px;text-align:center}
+.pin-dots{display:flex;gap:16px;margin-bottom:28px}
+.dot{width:18px;height:18px;border-radius:50%;border:2px solid #FFE4C4;background:transparent;transition:.2s}
+.dot.filled{background:#fff;border-color:#fff}
+.dot.err{background:#FF6B6B;border-color:#FF6B6B;animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:280px}
+.key{background:rgba(255,255,255,.15);border:none;border-radius:16px;padding:18px 0;font-size:24px;font-weight:700;color:#fff;cursor:pointer}
+.key:active{background:rgba(255,255,255,.35);transform:scale(.94)}
+.key.zero{grid-column:2}.key.del{background:rgba(255,100,100,.2);color:#FFD0D0}
+.pin-err{color:#FFD0D0;font-size:13px;margin-top:10px;height:18px;text-align:center}
+.pin-links{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;justify-content:center}
+.plink{color:#FFE4C4;font-size:12px;text-decoration:underline;cursor:pointer;background:none;border:none}
+/* Auto-lock timer display on pin screen */
+.autolock-msg{color:#FFE4C4;font-size:11px;margin-top:8px;text-align:center}
+.sync-bar{font-size:11px;color:#FFE4C4;margin-top:5px;display:flex;align-items:center;gap:5px}
+.sdot{width:7px;height:7px;border-radius:50%;background:#4ADE80;flex-shrink:0}
+.sdot.ing{background:#FCD34D;animation:pulse .8s infinite}.sdot.off{background:#F87171}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+#app-wrap{display:none;max-width:480px;margin:0 auto;min-height:100vh}
+.page{padding-bottom:80px;min-height:100vh}
+.hdr{background:linear-gradient(135deg,#FF6B00,#CC5500);padding:24px 20px 16px;border-radius:0 0 28px 28px;margin-bottom:18px}
+.hdr-top{display:flex;justify-content:space-between;align-items:flex-start}
+.hdr-btn{background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;font-size:17px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center}
+/* Auto-lock countdown badge */
+.lock-countdown{background:rgba(0,0,0,.25);color:#FFE4C4;font-size:10px;padding:2px 8px;border-radius:20px;margin-top:4px;text-align:center}
+.card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 12px #FF6B0015;border:1px solid #FFE4C4;margin-bottom:14px}
+.card-g{background:linear-gradient(135deg,#16A34A,#15803D);color:#fff}
+.card-blue{background:linear-gradient(135deg,#1D4ED8,#1E40AF);color:#fff}
+.px{padding:0 16px}
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1.5px solid #FFE4C4;display:flex;z-index:50}
+.nb{flex:1;padding:8px 0;background:transparent;border:none;cursor:pointer;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:2px;color:#78716C}
+.nb.on{color:#FF6B00;font-weight:700}
+.ni{font-size:18px}
+.mov{position:fixed;inset:0;background:#00000060;z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.mbox{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:24px;max-height:92vh;overflow-y:auto}
+.mhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.mcls{background:#F5F5F5;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:18px}
+.fl{font-size:13px;color:#78716C;font-weight:600;display:block;margin-bottom:4px;margin-top:12px}
+.fi{width:100%;border:1.5px solid #FFE4C4;border-radius:10px;padding:10px 12px;font-size:15px;color:#1C1917;background:#FFF8F0;outline:none}
+.fi:focus{border-color:#FF6B00}
+textarea.fi{resize:vertical;min-height:60px}
+.btn{border-radius:12px;padding:10px 20px;font-weight:700;font-size:15px;cursor:pointer;border:none}
+.bp{background:#FF6B00;color:#fff}.bg{background:#16A34A;color:#fff}
+.br{background:#DC2626;color:#fff}.bblue{background:#1D4ED8;color:#fff}
+.bfw{width:100%;margin-top:10px;display:block}
+.bdg{padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.ftabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.ftab{padding:7px 14px;border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;border:2px solid #FF6B00;background:transparent;color:#FF6B00}
+.ftab.on{background:#FF6B00;color:#fff}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #FFE4C4}
+.rmeta{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;align-items:center}
+.arow{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.sbtn{font-size:11px;background:#FF6B0020;color:#FF6B00;border:none;border-radius:8px;padding:3px 8px;cursor:pointer;font-weight:700}
+.shbtn{font-size:11px;background:#0EA5E920;color:#0EA5E9;border:none;border-radius:8px;padding:3px 8px;cursor:pointer;font-weight:700}
+.ebtn{font-size:11px;background:#7C3AED20;color:#7C3AED;border:none;border-radius:8px;padding:3px 8px;cursor:pointer;font-weight:700}
+.gbtn{font-size:11px;background:#16A34A20;color:#16A34A;border:none;border-radius:8px;padding:3px 8px;cursor:pointer;font-weight:700}
+.dbtn{font-size:11px;background:#FEF2F2;color:#DC2626;border:none;border-radius:8px;padding:3px 8px;cursor:pointer;font-weight:700}
+.alr{background:#FEF2F2;border:1.5px solid #FECACA;border-radius:14px;padding:14px;margin-bottom:14px}
+.si{width:100%;border:1.5px solid #FFE4C4;border-radius:10px;padding:10px 12px;font-size:14px;background:#FFF8F0;outline:none;margin-bottom:10px}
+.empty{text-align:center;padding:40px;color:#78716C}
+.sb{border-radius:12px;padding:12px}
+.sg{background:#F0FDF4;border:1.5px solid #BBF7D0}
+.sr{background:#FEF2F2;border:1.5px solid #FECACA}
+.sbl{background:#EFF6FF;border:1.5px solid #BFDBFE}
+.sl{font-size:12px;color:#78716C}.sv{font-weight:800;font-size:20px}
+.ob{font-size:11px;background:#FEE2E2;color:#DC2626;padding:1px 6px;border-radius:8px}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1C1917;color:#fff;padding:12px 20px;border-radius:20px;font-size:13px;z-index:400;max-width:90vw;text-align:center;pointer-events:none}
+/* Confirm dialog */
+.confirm-overlay{position:fixed;inset:0;background:#00000070;z-index:500;display:flex;align-items:center;justify-content:center;padding:24px}
+.confirm-box{background:#fff;border-radius:20px;padding:24px;width:100%;max-width:320px}
+.confirm-title{font-size:18px;font-weight:700;margin-bottom:8px;color:#DC2626}
+.confirm-msg{font-size:14px;color:#78716C;margin-bottom:20px;line-height:1.5}
+.confirm-btns{display:flex;gap:10px}
+.confirm-btns button{flex:1;padding:11px 0;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;border:none}
+/* Person card */
+.person-card{background:#fff;border-radius:16px;box-shadow:0 2px 12px #FF6B0015;border:1px solid #FFE4C4;margin-bottom:12px;overflow:hidden}
+.person-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer}
+.person-txns{background:#FFF8F0;border-top:1px solid #FFE4C4;padding:0 16px}
+.txn-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px dashed #FFE4C4}
+.txn-row:last-child{border-bottom:none}
+.person-actions{padding:10px 16px 14px;display:flex;gap:8px;flex-wrap:wrap;background:#FFF8F0}
+/* Registry */
+.reg-card{background:#fff;border-radius:16px;box-shadow:0 2px 12px #1D4ED815;border:1px solid #BFDBFE;margin-bottom:12px;overflow:hidden}
+.reg-section{background:#F0F7FF;padding:10px 16px;border-top:1px solid #BFDBFE}
+.reg-section-title{font-size:12px;font-weight:700;color:#1E40AF;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.reg-item{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #E0ECFF;font-size:13px}
+.reg-item:last-child{border-bottom:none}
+.status-badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:700}
+.add-small-btn{font-size:12px;background:#1D4ED820;color:#1D4ED8;border:none;border-radius:8px;padding:3px 10px;cursor:pointer;font-weight:700}
+/* Settings */
+.settings-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #FFE4C4}
+.settings-label{font-weight:600;font-size:15px}
+.settings-sub{font-size:12px;color:#78716C;margin-top:2px}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="sp-logo">📒</div>
+  <h2 class="sp-title">मेरा हिसाब</h2>
+  <p class="sp-sub">आपका पैसा, आपका हिसाब</p>
+  <div class="spin"></div>
+</div>
+
+<div id="login-screen">
+  <div style="text-align:center;margin-bottom:20px"><div style="font-size:52px">📒</div><h2 style="color:#fff;font-size:26px;font-family:Georgia,serif;margin-bottom:4px">मेरा हिसाब</h2><p style="color:#FFE4C4;font-size:13px">Login करें — सभी devices पर sync ☁️</p></div>
+  <div class="login-box">
+    <div class="login-tabs">
+      <button class="login-tab on" id="tab-login" onclick="switchTab('login')">Login करें</button>
+      <button class="login-tab" id="tab-register" onclick="switchTab('register')">नया Account</button>
+    </div>
+    <input class="linput" id="l-email" type="email" placeholder="📧 Email" autocomplete="email"/>
+    <input class="linput" id="l-pass" type="password" placeholder="🔑 Password (6+ अक्षर)" autocomplete="current-password"/>
+    <div id="l-name-row" style="display:none"><input class="linput" id="l-name" type="text" placeholder="👤 आपका नाम"/></div>
+    <button class="login-btn" id="login-btn-main">Login करें →</button>
+    <p class="login-err" id="login-err"></p>
+  </div>
+</div>
+
+<div id="pin-screen">
+  <div style="font-size:52px;margin-bottom:6px">📒</div>
+  <h2 style="color:#fff;font-size:24px;font-family:Georgia,serif;margin-bottom:4px" id="pin-name">मेरा हिसाब</h2>
+  <p class="pin-sub" id="pin-msg">PIN डालें</p>
+  <div class="pin-dots">
+    <div class="dot" id="d0"></div><div class="dot" id="d1"></div>
+    <div class="dot" id="d2"></div><div class="dot" id="d3"></div>
+  </div>
+  <div class="keypad">
+    <button class="key" data-k="1">1</button><button class="key" data-k="2">2</button><button class="key" data-k="3">3</button>
+    <button class="key" data-k="4">4</button><button class="key" data-k="5">5</button><button class="key" data-k="6">6</button>
+    <button class="key" data-k="7">7</button><button class="key" data-k="8">8</button><button class="key" data-k="9">9</button>
+    <button class="key zero" data-k="0">0</button><button class="key del" id="del-btn">⌫</button>
+  </div>
+  <p class="pin-err" id="pin-err"></p>
+  <div class="pin-links">
+    <button class="plink" id="change-pin-btn">🔑 PIN बदलें</button>
+    <button class="plink" id="logout-btn">🚪 Logout</button>
+  </div>
+  <p class="autolock-msg" id="autolock-info"></p>
+</div>
+
+<div id="app-wrap"><div id="app"></div></div>
+<div id="confirm-portal"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, set, onValue, off }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const FC={apiKey:"AIzaSyCL9GxYjDnWiSLDU-f1rdZyzZMhi6PziJY",authDomain:"mera-hisaab-778fa.firebaseapp.com",databaseURL:"https://mera-hisaab-778fa-default-rtdb.firebaseio.com",projectId:"mera-hisaab-778fa",storageBucket:"mera-hisaab-778fa.firebasestorage.app",messagingSenderId:"718237862704",appId:"1:718237862704:web:a870d537a584786aa0d6f5"};
+const fapp=initializeApp(FC);
+const auth=getAuth(fapp);
+const db=getDatabase(fapp);
+
+// ── Helpers ─────────────────────────────
+const today=()=>new Date().toISOString().split('T')[0];
+const uid=()=>Date.now()+'_'+Math.random().toString(36).slice(2,6);
+const fmtDate=d=>{try{return new Date(d).toLocaleDateString('hi-IN',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return d||'';}};
+const fmtAmt=n=>'₹'+Math.abs(Number(n)||0).toLocaleString('en-IN');
+const g=id=>document.getElementById(id);
+const gv=id=>{const e=g(id);return e?e.value.trim():'';};
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
+function bdg(c,t){return`<span class="bdg" style="background:${c}20;color:${c}">${t}</span>`;}
+
+// ── Confirm Dialog (replaces browser confirm) ──
+function showConfirm(title,msg,onYes){
+  const portal=g('confirm-portal');
+  portal.innerHTML=`<div class="confirm-overlay" id="cdialog">
+    <div class="confirm-box">
+      <p class="confirm-title">⚠️ ${title}</p>
+      <p class="confirm-msg">${msg}</p>
+      <div class="confirm-btns">
+        <button id="c-no" style="background:#F5F5F5;color:#1C1917">रद्द करें</button>
+        <button id="c-yes" style="background:#DC2626;color:#fff">हाँ, हटाएं</button>
+      </div>
+    </div>
+  </div>`;
+  g('c-no').onclick=()=>{portal.innerHTML='';};
+  g('c-yes').onclick=()=>{portal.innerHTML='';onYes();};
+}
+
+// ── State ────────────────────────────────
+let currentUser=null,fbUID='',syncSt='synced',dbListeners=[];
+let LS={udhars:[],pocket:[],reminders:[],registry:[]};
+let S={tab:'dashboard',modal:null,settleItem:null,
+       udharFilter:'active',udharSearch:'',expandedPerson:null,
+       historyType:'all',pocketDate:today(),regFilter:'all',regSearch:''};
+let mf={};
+let pinBuf='',pinMode='enter',pinTemp='';
+const PIN_KEY=()=>'mh_pin_'+fbUID;
+const AUTOLOCK_KEY=()=>'mh_autolock_'+fbUID;
+let appUnlocked=false;
+
+// ── AUTO-LOCK SYSTEM ─────────────────────
+let autoLockTimer=null;
+let autoLockSeconds=0; // 0 = off
+let countdownInterval=null;
+let lastActivity=Date.now();
+
+const AUTOLOCK_OPTIONS=[
+  {label:'बंद (कभी नहीं)',val:0},
+  {label:'1 मिनट',val:60},
+  {label:'2 मिनट',val:120},
+  {label:'5 मिनट',val:300},
+  {label:'10 मिनट',val:600},
+  {label:'15 मिनट',val:900},
+  {label:'30 मिनट',val:1800},
+];
+
+function loadAutoLockSetting(){
+  try{const v=localStorage.getItem(AUTOLOCK_KEY());autoLockSeconds=v?Number(v):300;}catch(e){autoLockSeconds=300;}
+}
+function saveAutoLockSetting(v){autoLockSeconds=v;try{localStorage.setItem(AUTOLOCK_KEY(),String(v));}catch(e){}}
+
+function resetAutoLockTimer(){
+  lastActivity=Date.now();
+  if(autoLockTimer)clearTimeout(autoLockTimer);
+  if(countdownInterval)clearInterval(countdownInterval);
+  if(!appUnlocked||autoLockSeconds===0)return;
+  autoLockTimer=setTimeout(()=>{if(appUnlocked){lockApp();updatePinScreenAutoLockInfo();}},autoLockSeconds*1000);
+}
+
+function updatePinScreenAutoLockInfo(){
+  const info=g('autolock-info');
+  if(!info)return;
+  if(autoLockSeconds===0){info.textContent='Auto-lock: बंद';}
+  else{const opt=AUTOLOCK_OPTIONS.find(o=>o.val===autoLockSeconds);info.textContent='Auto-lock: '+(opt?opt.label:autoLockSeconds+' सेकंड');}
+}
+
+// Track user activity to reset timer
+['touchstart','touchend','click','keydown','scroll'].forEach(evt=>{
+  document.addEventListener(evt,()=>{if(appUnlocked)resetAutoLockTimer();},{passive:true});
+});
+
+// ── Storage ──────────────────────────────
+function lsSave(key){try{localStorage.setItem('mh_'+fbUID+'_'+key,JSON.stringify(LS[key]));}catch(e){}}
+function lsLoad(){
+  if(!fbUID)return;
+  ['udhars','pocket','reminders','registry','bachat'].forEach(k=>{
+    try{const d=localStorage.getItem('mh_'+fbUID+'_'+k);if(d)LS[k]=JSON.parse(d);}catch(e){}
+  });
+}
+function setSyncing(){syncSt='syncing';refreshSync();}
+function setSynced(){syncSt='synced';refreshSync();}
+function setOffline(){syncSt='offline';refreshSync();}
+function refreshSync(){const d=g('sdot'),t=g('stxt');if(!d||!t)return;if(syncSt==='synced'){d.className='sdot';t.textContent='☁️ Cloud में Save है';}else if(syncSt==='syncing'){d.className='sdot ing';t.textContent='💾 Save हो रहा है...';}else{d.className='sdot off';t.textContent='📴 Offline';}}
+function uref(p){return ref(db,'users/'+fbUID+'/'+p);}
+async function dbSet(path,data){lsSave(path.split('/')[0]);setSyncing();try{await set(uref(path),data);setSynced();}catch(e){setOffline();}}
+async function dbDel(path){setSyncing();try{await set(uref(path),null);setSynced();}catch(e){setOffline();}}
+
+function startListeners(){
+  dbListeners.forEach(({r,fn})=>off(r,fn));dbListeners=[];
+
+  // Load from localStorage FIRST — instant display
+  lsLoad();
+  if(!LS.bachat){try{const d=localStorage.getItem('mh_'+fbUID+'_bachat');LS.bachat=d?JSON.parse(d):[];}catch(e){LS.bachat=[];}}
+  showPin(); // Show PIN immediately — don't wait for Firebase
+
+  // Firebase syncs in background silently
+  ['udhars','pocket','reminders','registry','bachat'].forEach(key=>{
+    const r=uref(key);
+    const fn=onValue(r,snap=>{
+      const val=snap.val();
+      const fresh=val?Object.values(val).sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||'')):[];
+      LS[key]=fresh;
+      try{localStorage.setItem('mh_'+fbUID+'_'+key,JSON.stringify(fresh));}catch(e){}
+      setSynced();
+      if(appUnlocked)render(); // Only re-render if app is open
+    },()=>setOffline());
+    dbListeners.push({r,fn});
+  });
+}
+
+// ── Auth ─────────────────────────────────
+// Hide splash after max 1.5s regardless
+setTimeout(()=>{
+  const sp=g('splash');
+  if(sp&&sp.style.display!=='none')sp.style.display='none';
+},1500);
+
+onAuthStateChanged(auth,user=>{
+  g('splash').style.display='none';
+  if(user){currentUser=user;fbUID=user.uid;loadAutoLockSetting();startListeners();}
+  else showLoginScreen();
+});
+
+window.switchTab=function(tab){
+  const isReg=tab==='register';
+  g('tab-login').classList.toggle('on',!isReg);g('tab-register').classList.toggle('on',isReg);
+  g('l-name-row').style.display=isReg?'block':'none';
+  g('login-btn-main').textContent=isReg?'Account बनाएं →':'Login करें →';
+  g('login-err').textContent='';
+};
+
+function showLoginScreen(){g('login-screen').style.display='flex';g('pin-screen').style.display='none';g('app-wrap').style.display='none';appUnlocked=false;}
+
+g('login-btn-main').onclick=async()=>{
+  const email=gv('l-email'),pass=gv('l-pass'),name=gv('l-name');
+  const isReg=g('tab-register').classList.contains('on');
+  g('login-err').textContent='';
+  if(!email||!pass){g('login-err').textContent='⚠️ Email और Password भरें';return;}
+  if(pass.length<6){g('login-err').textContent='⚠️ Password कम से कम 6 अक्षर';return;}
+  const btn=g('login-btn-main');btn.textContent='⏳...';btn.disabled=true;
+  try{
+    if(isReg){if(!name){g('login-err').textContent='⚠️ नाम भरें';btn.textContent='Account बनाएं →';btn.disabled=false;return;}const uc=await createUserWithEmailAndPassword(auth,email,pass);await updateProfile(uc.user,{displayName:name});}
+    else{await signInWithEmailAndPassword(auth,email,pass);}
+  }catch(err){btn.textContent=isReg?'Account बनाएं →':'Login करें →';btn.disabled=false;const msgs={'auth/email-already-in-use':'यह email पहले से registered है','auth/user-not-found':'Email नहीं मिला','auth/wrong-password':'Password गलत है','auth/invalid-credential':'Email या Password गलत है','auth/invalid-email':'Email सही नहीं है'};g('login-err').textContent=msgs[err.code]||err.message;}
+};
+['l-email','l-pass','l-name'].forEach(id=>{const el=g(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter')g('login-btn-main').click();});});
+
+// ── PIN ──────────────────────────────────
+function showPin(){
+  g('login-screen').style.display='none';g('app-wrap').style.display='none';appUnlocked=false;
+  const saved=localStorage.getItem(PIN_KEY());
+  if(!saved){pinMode='setup1';g('pin-msg').textContent='🔐 नया 4 अंक PIN बनाएं';g('change-pin-btn').style.display='none';}
+  else{pinMode='enter';g('pin-msg').textContent='PIN डालें और अंदर आएं 👇';g('change-pin-btn').style.display='';}
+  const n=currentUser?.displayName||currentUser?.email?.split('@')[0]||'Alok';
+  g('pin-name').textContent=n+' जी 🙏';
+  pinBuf='';updateDots();g('pin-screen').style.display='flex';
+  updatePinScreenAutoLockInfo();
+}
+function updateDots(){for(let i=0;i<4;i++){g('d'+i).classList.toggle('filled',i<pinBuf.length);g('d'+i).classList.remove('err');}}
+function shakeErr(msg){for(let i=0;i<4;i++)g('d'+i).classList.add('err');g('pin-err').textContent=msg;setTimeout(()=>{pinBuf='';updateDots();g('pin-err').textContent='';},900);}
+function processPin(){
+  if(pinMode==='setup1'){pinTemp=pinBuf;pinBuf='';updateDots();pinMode='setup2';g('pin-msg').textContent='✅ PIN फिर से डालें';g('pin-err').textContent='';}
+  else if(pinMode==='setup2'){if(pinBuf===pinTemp){localStorage.setItem(PIN_KEY(),btoa(pinBuf));unlockApp();}else{shakeErr('❌ PIN मेल नहीं खाया');pinMode='setup1';pinTemp='';setTimeout(()=>{g('pin-msg').textContent='🔐 नया PIN बनाएं';},900);}}
+  else{try{const saved=atob(localStorage.getItem(PIN_KEY())||'');if(pinBuf===saved)unlockApp();else shakeErr('❌ गलत PIN');}catch(e){shakeErr('❌ गलत PIN');}}
+}
+function unlockApp(){g('pin-screen').style.display='none';g('app-wrap').style.display='block';appUnlocked=true;resetAutoLockTimer();render();}
+function lockApp(){
+  if(autoLockTimer)clearTimeout(autoLockTimer);
+  if(countdownInterval)clearInterval(countdownInterval);
+  pinBuf='';updateDots();g('pin-err').textContent='';appUnlocked=false;
+  const saved=localStorage.getItem(PIN_KEY());
+  if(saved){pinMode='enter';g('pin-msg').textContent='PIN डालें 👇';g('change-pin-btn').style.display='';}
+  g('app-wrap').style.display='none';g('pin-screen').style.display='flex';
+  updatePinScreenAutoLockInfo();
+}
+
+document.querySelectorAll('.key').forEach(b=>b.addEventListener('click',()=>{if(!b.dataset.k)return;if(pinBuf.length<4){pinBuf+=b.dataset.k;updateDots();if(pinBuf.length===4)setTimeout(processPin,150);}}));
+g('del-btn').addEventListener('click',()=>{if(pinBuf.length>0){pinBuf=pinBuf.slice(0,-1);updateDots();}});
+g('change-pin-btn').addEventListener('click',()=>{if(confirm('PIN बदलें?')){localStorage.removeItem(PIN_KEY());pinMode='setup1';pinBuf='';updateDots();g('pin-msg').textContent='🔐 नया PIN बनाएं';g('change-pin-btn').style.display='none';}});
+g('logout-btn').addEventListener('click',async()=>{if(confirm('Logout करें?')){dbListeners.forEach(({r,fn})=>off(r,fn));appUnlocked=false;await signOut(auth);}});
+
+// ── CRUD ─────────────────────────────────
+async function saveUdhar(e){
+  e.createdAt=e.createdAt||e.date||today();
+  e.personKey=e.name.trim().toLowerCase();
+  const i=LS.udhars.findIndex(x=>x.id===e.id);
+  if(i>=0)LS.udhars[i]=e;else LS.udhars.unshift(e);
+  lsSave('udhars');await dbSet('udhars/'+e.id,e);
+  if(e.dueDate&&i<0){const r={id:uid(),udhaarId:e.id,name:e.name,amount:e.amount,dueDate:e.dueDate,done:false,createdAt:today()};LS.reminders.push(r);lsSave('reminders');await dbSet('reminders/'+r.id,r);}
+  S.modal=null;mf={};render();toast('✅ उधार save हो गया!');
+}
+
+async function deleteUdhar(id){
+  LS.udhars=LS.udhars.filter(x=>x.id!==id);lsSave('udhars');await dbDel('udhars/'+id);
+  LS.reminders=LS.reminders.filter(x=>x.udhaarId!==id);lsSave('reminders');await dbDel('reminders/'+id);
+  render();toast('🗑️ उधार हटा दिया गया');
+}
+
+async function settleUdhar(id){
+  const u=LS.udhars.find(x=>x.id===id);if(!u)return;
+  const upd={...u,settled:true,settledDate:today()};
+  const i=LS.udhars.findIndex(x=>x.id===id);if(i>=0)LS.udhars[i]=upd;
+  lsSave('udhars');await dbSet('udhars/'+id,upd);
+  for(const r of LS.reminders.filter(x=>x.udhaarId===id)){const ri=LS.reminders.findIndex(x=>x.id===r.id);if(ri>=0)LS.reminders[ri]={...r,done:true};await dbSet('reminders/'+r.id,{...r,done:true});}
+  lsSave('reminders');S.modal=null;S.settleItem=null;mf={};render();toast('✅ चुकता हो गया!');
+}
+
+async function savePocket(e){
+  e.createdAt=e.date;
+  const i=LS.pocket.findIndex(x=>x.id===e.id);
+  if(i>=0)LS.pocket[i]=e;else LS.pocket.unshift(e);
+  lsSave('pocket');await dbSet('pocket/'+e.id,e);
+  S.modal=null;mf={};render();toast('✅ Save हो गया!');
+}
+
+async function deletePocket(id){
+  LS.pocket=LS.pocket.filter(x=>x.id!==id);lsSave('pocket');await dbDel('pocket/'+id);
+  render();toast('🗑️ खर्च/आमदनी हटाई गई');
+}
+
+async function saveReg(e){
+  e.createdAt=e.createdAt||e.docDate||today();
+  if(!e.payments)e.payments=[];
+  if(!e.expenses)e.expenses=[];
+  e.totalReceived=e.payments.reduce((s,p)=>s+Number(p.amount||0),0);
+  e.totalCost=e.expenses.reduce((s,x)=>s+Number(x.amount||0),0);
+  e.profit=e.totalReceived-e.totalCost;
+  const i=LS.registry.findIndex(x=>x.id===e.id);
+  if(i>=0)LS.registry[i]=e;else LS.registry.unshift(e);
+  lsSave('registry');await dbSet('registry/'+e.id,e);
+  S.modal=null;mf={};render();toast('✅ Document save हो गया!');
+}
+
+async function deleteReg(id){
+  LS.registry=LS.registry.filter(x=>x.id!==id);lsSave('registry');await dbDel('registry/'+id);
+  render();toast('🗑️ Document हटा दिया गया');
+}
+
+async function addRegPayment(regId,payment){
+  const r=LS.registry.find(x=>x.id===regId);if(!r)return;
+  if(!r.payments)r.payments=[];
+  r.payments.push(payment);
+  r.totalReceived=r.payments.reduce((s,p)=>s+Number(p.amount||0),0);
+  r.profit=r.totalReceived-(r.totalCost||0);
+  const i=LS.registry.findIndex(x=>x.id===regId);if(i>=0)LS.registry[i]=r;
+  lsSave('registry');await dbSet('registry/'+regId,r);
+  S.modal=null;mf={};render();toast('✅ Payment जोड़ी गई!');
+}
+
+async function deleteRegPayment(regId,pmtId){
+  const r=LS.registry.find(x=>x.id===regId);if(!r)return;
+  r.payments=(r.payments||[]).filter(p=>p.id!==pmtId);
+  r.totalReceived=r.payments.reduce((s,p)=>s+Number(p.amount||0),0);
+  r.profit=r.totalReceived-(r.totalCost||0);
+  const i=LS.registry.findIndex(x=>x.id===regId);if(i>=0)LS.registry[i]=r;
+  lsSave('registry');await dbSet('registry/'+regId,r);
+  render();toast('🗑️ Payment हटाई गई');
+}
+
+async function addRegExpense(regId,expense){
+  const r=LS.registry.find(x=>x.id===regId);if(!r)return;
+  if(!r.expenses)r.expenses=[];
+  r.expenses.push(expense);
+  r.totalCost=r.expenses.reduce((s,x)=>s+Number(x.amount||0),0);
+  r.profit=(r.totalReceived||0)-r.totalCost;
+  const i=LS.registry.findIndex(x=>x.id===regId);if(i>=0)LS.registry[i]=r;
+  lsSave('registry');await dbSet('registry/'+regId,r);
+  S.modal=null;mf={};render();toast('✅ खर्चा जोड़ा गया!');
+}
+
+async function deleteRegExpense(regId,expId){
+  const r=LS.registry.find(x=>x.id===regId);if(!r)return;
+  r.expenses=(r.expenses||[]).filter(x=>x.id!==expId);
+  r.totalCost=r.expenses.reduce((s,x)=>s+Number(x.amount||0),0);
+  r.profit=(r.totalReceived||0)-r.totalCost;
+  const i=LS.registry.findIndex(x=>x.id===regId);if(i>=0)LS.registry[i]=r;
+  lsSave('registry');await dbSet('registry/'+regId,r);
+  render();toast('🗑️ खर्चा हटाया गया');
+}
+
+async function saveRem(r){r.createdAt=today();LS.reminders.push(r);lsSave('reminders');await dbSet('reminders/'+r.id,r);S.modal=null;render();toast('✅ रिमाइंडर जुड़ गया!');}
+async function doneRem(id){const r=LS.reminders.find(x=>x.id===id);if(!r)return;const ri=LS.reminders.findIndex(x=>x.id===id);LS.reminders[ri]={...r,done:true};lsSave('reminders');await dbSet('reminders/'+id,{...r,done:true});render();}
+async function deleteRem(id){LS.reminders=LS.reminders.filter(x=>x.id!==id);lsSave('reminders');await dbDel('reminders/'+id);render();toast('🗑️ रिमाइंडर हटाया गया');}
+
+// ── COMPUTED ─────────────────────────────
+function getPersonGroups(filter,search){
+  const map={};
+  LS.udhars.forEach(u=>{
+    const key=(u.personKey||u.name.trim().toLowerCase());
+    if(!map[key])map[key]={name:u.name,key,txns:[],lastDate:u.createdAt||''};
+    map[key].txns.push(u);
+    if((u.createdAt||'')>(map[key].lastDate||''))map[key].lastDate=u.createdAt;
+  });
+  return Object.values(map).filter(pg=>{
+    const hasActive=pg.txns.some(t=>!t.settled);
+    if(filter==='active'&&!hasActive)return false;
+    if(filter==='settled'&&hasActive)return false;
+    if(filter==='lena'&&!pg.txns.some(t=>!t.settled&&t.type==='lena'))return false;
+    if(filter==='dena'&&!pg.txns.some(t=>!t.settled&&t.type==='dena'))return false;
+    if(search&&!pg.name.toLowerCase().includes(search.toLowerCase()))return false;
+    pg.netLena=pg.txns.filter(t=>!t.settled&&t.type==='lena').reduce((s,t)=>s+Number(t.amount),0);
+    pg.netDena=pg.txns.filter(t=>!t.settled&&t.type==='dena').reduce((s,t)=>s+Number(t.amount),0);
+    pg.net=pg.netLena-pg.netDena;
+    return true;
+  }).sort((a,b)=>(b.lastDate||'').localeCompare(a.lastDate||''));
+}
+
+const aU=()=>LS.udhars.filter(u=>!u.settled);
+const totalLena=()=>aU().filter(u=>u.type==='lena').reduce((s,u)=>s+Number(u.amount),0);
+const totalDena=()=>aU().filter(u=>u.type==='dena').reduce((s,u)=>s+Number(u.amount),0);
+const aIn=()=>LS.pocket.filter(t=>t.dir==='in').reduce((s,t)=>s+Number(t.amount),0);
+const aOut=()=>LS.pocket.filter(t=>t.dir==='out').reduce((s,t)=>s+Number(t.amount),0);
+const bal=()=>aIn()-aOut();
+const tIn=()=>LS.pocket.filter(t=>t.date===today()&&t.dir==='in').reduce((s,t)=>s+Number(t.amount),0);
+const tOut=()=>LS.pocket.filter(t=>t.date===today()&&t.dir==='out').reduce((s,t)=>s+Number(t.amount),0);
+const ovU=()=>aU().filter(u=>u.dueDate&&u.dueDate<today());
+
+// ── SHARE ────────────────────────────────
+function shareU(id){const u=LS.udhars.find(x=>x.id==id);if(!u)return;const msg=`📒 *मेरा हिसाब — उधार*\n👤 ${u.name}\n💰 ${fmtAmt(u.amount)}\n${u.type==='lena'?'📥 आपने मुझसे उधार लिया':'📤 मैंने आपसे उधार लिया'}\n📅 ${fmtDate(u.createdAt)}\n${u.settled?'✅ चुकता':'⏳ बकाया'}`;if(navigator.share)navigator.share({title:'उधार',text:msg}).catch(()=>cpTxt(msg));else cpTxt(msg);}
+function shareReg(id){const r=LS.registry.find(x=>x.id==id);if(!r)return;const msg=`📄 *Document Record*\n👤 ${r.clientName} | ${r.docType}\n📅 ${fmtDate(r.docDate)}\n💰 मिला: ${fmtAmt(r.totalReceived||0)}\n🧾 खर्च: ${fmtAmt(r.totalCost||0)}\n${(r.profit||0)>=0?'📈':'📉'} ${fmtAmt(Math.abs(r.profit||0))}`;if(navigator.share)navigator.share({title:'Document',text:msg}).catch(()=>cpTxt(msg));else cpTxt(msg);}
+function cpTxt(t){try{navigator.clipboard.writeText(t).then(()=>toast('📋 Copy हो गया!'));}catch(e){const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);toast('📋 Copy हो गया!');}}
+
+// ── RENDER ───────────────────────────────
+function render(){g('app').innerHTML=page()+nav()+buildModal();attach();refreshSync();}
+
+function page(){switch(S.tab){case 'udhar':return pgUdhar();case 'pocket':return pgPocket();case 'registry':return pgRegistry();case 'history':return pgHistory();case 'bachat':return pgBachat();case 'settings':return pgSettings();default:return pgDash();}}
+
+// ── DASHBOARD ────────────────────────────
+function pgDash(){
+  const ov=ovU();const nm=currentUser?.displayName||currentUser?.email?.split('@')[0]||'Alok';
+  const ovH=ov.length>0?`<div class="alr"><p style="font-weight:700;color:#DC2626;margin-bottom:8px">⚠️ ${ov.length} उधार की तारीख निकल गई!</p>${ov.slice(0,2).map(u=>`<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px"><span>${u.name}</span><span style="font-weight:700;color:#DC2626">${fmtAmt(u.amount)}</span></div>`).join('')}</div>`:'';
+  const tReg=LS.registry.length,tProfit=LS.registry.reduce((s,r)=>s+Number(r.profit||0),0),pReg=LS.registry.filter(r=>r.status!=='complete').length;
+  const curBal=bal();const alOpt=AUTOLOCK_OPTIONS.find(o=>o.val===autoLockSeconds);
+  return `<div class="page"><div class="hdr">
+    <div class="hdr-top"><div><p style="color:#FFE4C4;font-size:13px;font-weight:600">नमस्ते ${nm} जी 🙏</p><h1 style="color:#fff;font-size:26px;font-family:Georgia,serif;margin:4px 0 0">मेरा हिसाब</h1></div>
+    <div class="hdr-btns">
+      <button class="hdr-btn" onclick="(()=>{if(window.__lockNav)window.__lockNav();})()" id="lock-btn">🔒</button>
+    </div></div>
+    <div class="sync-bar"><span class="sdot" id="sdot"></span><span id="stxt">☁️ Cloud में Save है</span><span style="margin-left:auto;font-size:10px;opacity:.8">🔒 ${alOpt?alOpt.label:'5 मिनट'}</span></div>
+  </div>
+  <div class="px">
+    <div class="card ${curBal>=0?'card-g':''}" style="margin-bottom:14px${curBal<0?';background:linear-gradient(135deg,#DC2626,#B91C1C);color:#fff':''}">
+      <p style="font-size:13px;opacity:.85;margin-bottom:4px">${curBal>=0?'💰 जेब में बचे':'⚠️ जेब में घाटा'}</p>
+      <p style="font-size:36px;font-weight:800;font-family:Georgia,serif">${fmtAmt(curBal)}</p>
+      <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap">
+        <div><p style="font-size:11px;opacity:.8">आज आया</p><p style="font-weight:700">${fmtAmt(tIn())}</p></div>
+        <div><p style="font-size:11px;opacity:.8">आज गया</p><p style="font-weight:700">${fmtAmt(tOut())}</p></div>
+        <div><p style="font-size:11px;opacity:.8">कुल आया</p><p style="font-weight:700">${fmtAmt(aIn())}</p></div>
+        <div><p style="font-size:11px;opacity:.8">कुल गया</p><p style="font-weight:700">${fmtAmt(aOut())}</p></div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="sb sg"><p class="sl">📥 मिलना है</p><p class="sv" style="color:#16A34A">${fmtAmt(totalLena())}</p></div>
+      <div class="sb sr"><p class="sl">📤 देना है</p><p class="sv" style="color:#DC2626">${fmtAmt(totalDena())}</p></div>
+    </div>
+    <div class="card card-blue" style="margin-bottom:14px"><p style="font-size:13px;opacity:.85;margin-bottom:8px">📄 Registry</p><div style="display:flex;gap:16px"><div><p style="font-size:12px;opacity:.8">Documents</p><p style="font-weight:800;font-size:20px">${tReg}</p></div><div><p style="font-size:12px;opacity:.8">मुनाफा</p><p style="font-weight:800;font-size:20px">${fmtAmt(tProfit)}</p></div><div><p style="font-size:12px;opacity:.8">Pending</p><p style="font-weight:800;font-size:20px">${pReg}</p></div></div></div>
+    ${ovH}
+    <div class="card" style="margin-bottom:14px"><p style="font-weight:700;margin-bottom:10px">⚡ जल्दी करें</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="qab" data-a="udhar" style="padding:10px 8px;border-radius:12px;border:2px solid #FF6B0020;background:#FF6B0010;color:#FF6B00;font-weight:700;font-size:13px;cursor:pointer">📒 उधार जोड़ें</button>
+      <button class="qab" data-a="pocket" style="padding:10px 8px;border-radius:12px;border:2px solid #DC262620;background:#DC262610;color:#DC2626;font-weight:700;font-size:13px;cursor:pointer">💸 खर्च/आमदनी</button>
+      <button class="qab" data-a="registry" style="padding:10px 8px;border-radius:12px;border:2px solid #1D4ED820;background:#1D4ED810;color:#1D4ED8;font-weight:700;font-size:13px;cursor:pointer">📄 Document जोड़ें</button>
+      <button class="qab" data-a="reminder" style="padding:10px 8px;border-radius:12px;border:2px solid #D9770620;background:#D9770610;color:#D97706;font-weight:700;font-size:13px;cursor:pointer">🔔 रिमाइंडर</button>
+    </div></div>
+  </div></div>`;
+}
+
+// ── UDHAR ────────────────────────────────
+function pgUdhar(){
+  const groups=getPersonGroups(S.udharFilter,S.udharSearch);
+  const tL=LS.udhars.filter(u=>!u.settled&&u.type==='lena').reduce((s,u)=>s+Number(u.amount),0);
+  const tD=LS.udhars.filter(u=>!u.settled&&u.type==='dena').reduce((s,u)=>s+Number(u.amount),0);
+
+  const cards=groups.map(pg=>{
+    const exp=S.expandedPerson===pg.key;
+    const nC=pg.net>0?'#16A34A':pg.net<0?'#DC2626':'#78716C';
+    const nL=pg.net>0?'मिलना है':pg.net<0?'देना है':'बराबर';
+    const txnsHtml=exp?`<div class="person-txns">${pg.txns.map(t=>`
+      <div class="txn-row">
+        <div style="flex:1">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+            <span style="font-size:13px;font-weight:600">${t.type==='lena'?'📥':'📤'} ${t.type==='lena'?'लेना था':'देना था'}</span>
+            ${t.settled?'<span style="font-size:10px;color:#16A34A;background:#F0FDF4;padding:1px 6px;border-radius:8px;font-weight:700">✅ चुकता</span>':''}
+          </div>
+          <div style="display:flex;gap:6px;margin-top:3px;flex-wrap:wrap">
+            <span style="font-size:11px;color:#78716C">📅 ${fmtDate(t.createdAt)}</span>
+            ${t.service&&t.service!=='general'?`<span style="font-size:11px;background:#D9770620;color:#D97706;padding:1px 6px;border-radius:8px">${t.service}</span>`:''}
+            ${t.mode==='online'?'<span style="font-size:11px;background:#0EA5E920;color:#0EA5E9;padding:1px 6px;border-radius:8px">📱 Online</span>':''}
+          </div>
+          ${t.note?`<p style="font-size:11px;color:#78716C;margin-top:2px">${t.note}</p>`:''}
+          <div class="arow">
+            ${!t.settled?`<button class="sbtn su-settle" data-id="${t.id}">✅ चुकता</button>`:''}
+            <button class="ebtn su-edit" data-id="${t.id}">✏️ Edit</button>
+            <button class="shbtn su-share" data-id="${t.id}">📤 Share</button>
+            <button class="dbtn su-del" data-id="${t.id}">🗑️ हटाएं</button>
+          </div>
+        </div>
+        <p style="font-weight:800;font-size:16px;color:${t.type==='lena'?'#16A34A':'#DC2626'};margin-left:10px">${t.type==='lena'?'+':'-'}${fmtAmt(t.amount)}</p>
+      </div>`).join('')}</div>`:''
+    ;
+    return `<div class="person-card">
+      <div class="person-header expand-person" data-key="${pg.key}">
+        <div><p style="font-weight:700;font-size:16px">${pg.name}</p><p style="font-size:12px;color:#78716C;margin-top:2px">${pg.txns.length} लेनदेन • ${fmtDate(pg.lastDate)}</p></div>
+        <div style="text-align:right"><p style="font-weight:800;font-size:18px;color:${nC}">${fmtAmt(Math.abs(pg.net))}</p><p style="font-size:12px;color:${nC};font-weight:600">${nL} ${exp?'▲':'▼'}</p></div>
+      </div>
+      ${txnsHtml}
+      <div class="person-actions">
+        <button class="sbtn add-udhar-person" data-name="${pg.name}">+ और उधार</button>
+        ${pg.txns.some(t=>!t.settled)?`<button class="shbtn settle-all-btn" data-key="${pg.key}">✅ सब चुकता</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="page px" style="padding-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h2 style="font-family:Georgia,serif">📒 उधार खाता</h2><button class="btn bp aub-btn" style="padding:8px 14px;font-size:14px">+ जोड़ें</button></div>
+    <div class="g2"><div class="sb sg"><p class="sl">📥 मिलना है</p><p class="sv" style="color:#16A34A">${fmtAmt(tL)}</p></div><div class="sb sr"><p class="sl">📤 देना है</p><p class="sv" style="color:#DC2626">${fmtAmt(tD)}</p></div></div>
+    <input class="si" id="us" placeholder="🔍 नाम खोजें..." value="${S.udharSearch}"/>
+    <div class="ftabs">${['active|चालू','lena|मिलना है','dena|देना है','settled|चुकता','all|सब'].map(s=>{const[v,l]=s.split('|');return`<button class="ftab uf ${S.udharFilter===v?'on':''}" data-val="${v}">${l}</button>`;}).join('')}</div>
+    ${groups.length===0?`<div class="empty"><p style="font-size:40px">📒</p><p>कोई उधार नहीं</p></div>`:cards}
+  </div>`;
+}
+
+// ── POCKET ───────────────────────────────
+function pgPocket(){
+  const dT=LS.pocket.filter(t=>t.date===S.pocketDate);
+  const dI=dT.filter(t=>t.dir==='in').reduce((s,t)=>s+Number(t.amount),0);
+  const dO=dT.filter(t=>t.dir==='out').reduce((s,t)=>s+Number(t.amount),0);
+  const curBal=bal();
+  return `<div class="page px" style="padding-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h2 style="font-family:Georgia,serif">👛 जेब खर्च</h2><div style="display:flex;gap:6px"><button class="btn bg aib-btn" style="padding:8px 10px;font-size:13px">+ आमदनी</button><button class="btn br apb-btn" style="padding:8px 10px;font-size:13px">+ खर्च</button></div></div>
+    <div class="g2"><div class="sb sg"><p class="sl">कुल आया</p><p class="sv" style="color:#16A34A">${fmtAmt(aIn())}</p></div><div class="sb sr"><p class="sl">कुल गया</p><p class="sv" style="color:#DC2626">${fmtAmt(aOut())}</p></div></div>
+    <div class="sb ${curBal>=0?'sg':'sr'}" style="margin-bottom:14px;border-radius:14px;padding:14px">
+      <p style="font-size:12px;color:${curBal>=0?'#16A34A':'#DC2626'};font-weight:700">${curBal>=0?'✅ कुल बचत':'⚠️ कुल घाटा'}</p>
+      <p style="font-weight:800;font-size:28px;color:${curBal>=0?'#16A34A':'#DC2626'}">${fmtAmt(curBal)}</p>
+    </div>
+    <input type="date" class="fi" id="pd" value="${S.pocketDate}" style="margin-bottom:10px"/>
+    <div class="g2"><div class="sb sg"><p class="sl">इस दिन आया</p><p class="sv" style="color:#16A34A;font-size:18px">${fmtAmt(dI)}</p></div><div class="sb sr"><p class="sl">इस दिन गया</p><p class="sv" style="color:#DC2626;font-size:18px">${fmtAmt(dO)}</p></div></div>
+    ${dT.length===0?`<div class="empty"><p style="font-size:40px">👛</p><p>इस दिन कोई लेनदेन नहीं</p></div>`:dT.map(t=>`
+      <div class="row">
+        <div style="flex:1">
+          <p style="font-weight:700">${t.dir==='in'?'💰':'💸'} ${t.category}</p>
+          <div class="rmeta">${t.mode==='cash'?'<span style="font-size:11px;background:#16A34A20;color:#16A34A;padding:1px 6px;border-radius:8px">💵 Cash</span>':'<span style="font-size:11px;background:#0EA5E920;color:#0EA5E9;padding:1px 6px;border-radius:8px">📱 Online</span>'}${t.note?`<span style="font-size:12px;color:#78716C">${t.note}</span>`:''}</div>
+          <div class="arow">
+            <button class="ebtn pkt-edit" data-id="${t.id}">✏️ Edit</button>
+            <button class="dbtn pkt-del" data-id="${t.id}">🗑️ हटाएं</button>
+          </div>
+        </div>
+        <p style="font-weight:800;font-size:17px;color:${t.dir==='in'?'#16A34A':'#DC2626'};margin-left:10px">${t.dir==='in'?'+':'-'}${fmtAmt(t.amount)}</p>
+      </div>`).join('')}
+  </div>`;
+}
+
+// ── REGISTRY ──────────────────────────────
+function pgRegistry(){
+  let fi=LS.registry.filter(r=>S.regFilter==='all'?true:r.status===S.regFilter).filter(r=>(r.clientName||'').toLowerCase().includes(S.regSearch.toLowerCase()));
+  const tI=fi.reduce((s,r)=>s+Number(r.totalReceived||0),0),tC=fi.reduce((s,r)=>s+Number(r.totalCost||0),0),tP=fi.reduce((s,r)=>s+Number(r.profit||0),0);
+  const sL={complete:'✅ पूर्ण',registered:'📋 Registered',pending:'⏳ Pending'};
+  const sC={complete:'#16A34A',registered:'#1D4ED8',pending:'#D97706'};
+  return `<div class="page px" style="padding-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h2 style="font-family:Georgia,serif">📄 Registry</h2><button class="btn bblue areg-btn" style="font-size:14px;padding:8px 14px">+ जोड़ें</button></div>
+    <div class="g3"><div class="sb sg"><p class="sl">मिला</p><p style="font-weight:800;font-size:15px;color:#16A34A">${fmtAmt(tI)}</p></div><div class="sb sr"><p class="sl">खर्च</p><p style="font-weight:800;font-size:15px;color:#DC2626">${fmtAmt(tC)}</p></div><div class="sb ${tP>=0?'sg':'sr'}"><p class="sl">मुनाफा</p><p style="font-weight:800;font-size:15px;color:${tP>=0?'#16A34A':'#DC2626'}">${fmtAmt(tP)}</p></div></div>
+    <input class="si" id="regsrch" placeholder="🔍 Client नाम..." value="${S.regSearch}"/>
+    <div class="ftabs">${['all|सब','pending|Pending','registered|Registered','complete|पूर्ण'].map(s=>{const[v,l]=s.split('|');return`<button class="ftab rf ${S.regFilter===v?'on':''}" data-val="${v}">${l}</button>`;}).join('')}</div>
+    ${fi.length===0?`<div class="empty"><p style="font-size:40px">📄</p><p>कोई document नहीं</p></div>`:fi.map(r=>{
+      const pC=(r.profit||0)>=0?'#16A34A':'#DC2626';
+      const sc=sC[r.status]||'#D97706',sl=sL[r.status]||'⏳ Pending';
+      const pmts=r.payments||[],exps=r.expenses||[];
+      return `<div class="reg-card">
+        <div style="padding:14px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <p style="font-weight:700;font-size:16px;color:#1E40AF">${r.clientName}</p>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+                ${bdg('#7C3AED',r.docType||'Document')}
+                <span class="status-badge" style="background:${sc}20;color:${sc}">${sl}</span>
+                ${r.finalCopyGiven?'<span class="status-badge" style="background:#16A34A20;color:#16A34A">📁 Final Copy दी</span>':''}
+              </div>
+              <p style="font-size:12px;color:#78716C;margin-top:4px">📅 ${fmtDate(r.docDate)}${r.regNumber?` • Reg# ${r.regNumber}`:''}</p>
+              ${r.clientMobile?`<p style="font-size:12px;color:#78716C">📱 ${r.clientMobile}</p>`:''}
+              ${r.propertyDesc?`<p style="font-size:12px;color:#78716C;margin-top:4px;background:#F0F7FF;padding:5px 8px;border-radius:8px">📝 ${r.propertyDesc}</p>`:''}
+            </div>
+            <div style="text-align:right;margin-left:8px">
+              <p style="font-weight:800;font-size:18px;color:${pC}">${(r.profit||0)>=0?'+':'-'}${fmtAmt(Math.abs(r.profit||0))}</p>
+              <p style="font-size:11px;color:#78716C">मुनाफा</p>
+            </div>
+          </div>
+        </div>
+        <!-- Payments -->
+        <div class="reg-section">
+          <p class="reg-section-title"><span>💰 मिला — कुल: ${fmtAmt(r.totalReceived||0)}</span><button class="add-small-btn add-reg-payment" data-id="${r.id}">+ Payment</button></p>
+          ${pmts.length===0?`<p style="font-size:12px;color:#78716C">कोई payment नहीं</p>`:
+            pmts.map(p=>`<div class="reg-item">
+              <div style="flex:1"><span style="font-weight:600;color:#16A34A">${fmtAmt(p.amount)}</span><span style="font-size:11px;color:#78716C"> • ${fmtDate(p.date)}</span>${p.note?`<br><span style="font-size:11px;color:#78716C;font-style:italic">${p.note}</span>`:''}</div>
+              <button class="dbtn del-reg-pmt" data-regid="${r.id}" data-pmtid="${p.id}">🗑️</button>
+            </div>`).join('')}
+        </div>
+        <!-- Expenses -->
+        <div class="reg-section">
+          <p class="reg-section-title"><span>🧾 खर्चे — कुल: ${fmtAmt(r.totalCost||0)}</span><button class="add-small-btn add-reg-expense" data-id="${r.id}">+ खर्चा</button></p>
+          ${exps.length===0?`<p style="font-size:12px;color:#78716C">कोई खर्चा नहीं</p>`:
+            exps.map(x=>`<div class="reg-item">
+              <div style="flex:1"><span style="font-weight:600;color:#1E40AF">${x.type}</span><span style="font-size:11px;color:#78716C"> • ${fmtDate(x.date)}</span>${x.note?`<br><span style="font-size:11px;color:#78716C;font-style:italic">${x.note}</span>`:''}</div>
+              <div style="display:flex;gap:6px;align-items:center"><span style="font-weight:700;color:#DC2626">${fmtAmt(x.amount)}</span><button class="dbtn del-reg-exp" data-regid="${r.id}" data-expid="${x.id}">🗑️</button></div>
+            </div>`).join('')}
+        </div>
+        <!-- Profit bar -->
+        <div style="display:flex;justify-content:space-between;padding:8px 16px;background:#fff;border-top:1px solid #BFDBFE">
+          <span style="font-size:13px;color:#78716C">मिला ${fmtAmt(r.totalReceived||0)} − खर्च ${fmtAmt(r.totalCost||0)}</span>
+          <span style="font-weight:800;color:${pC}">${(r.profit||0)>=0?'📈 ':'📉 '}${fmtAmt(Math.abs(r.profit||0))}</span>
+        </div>
+        ${r.notes?`<div style="padding:8px 16px;background:#FFFBEB;border-top:1px solid #FDE68A"><p style="font-size:12px;color:#92400E">📝 ${r.notes}</p></div>`:''}
+        <div class="reg-actions">
+          <button class="ebtn reg-edit" data-id="${r.id}">✏️ Edit</button>
+          <button class="shbtn reg-share" data-id="${r.id}">📤 Share</button>
+          ${r.status!=='complete'?`<button class="gbtn reg-done" data-id="${r.id}">✅ पूर्ण करें</button>`:''}
+          ${!r.finalCopyGiven?`<button class="sbtn reg-copy" data-id="${r.id}">📁 Final Copy दी</button>`:''}
+          <button class="dbtn reg-del" data-id="${r.id}">🗑️ हटाएं</button>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ── HISTORY ───────────────────────────────
+function pgHistory(){
+  const all=[...LS.udhars.map(u=>({...u,_t:'udhar'})),...LS.pocket.map(p=>({...p,_t:'pocket'})),...LS.registry.map(r=>({...r,_t:'registry'}))].sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+  const fi=S.historyType==='all'?all:all.filter(t=>t._t===S.historyType);
+  return `<div class="page px" style="padding-top:16px">
+    <h2 style="font-family:Georgia,serif;margin-bottom:14px">📜 पूरा इतिहास</h2>
+    <div class="ftabs">${['all|सब','udhar|उधार','pocket|खर्च','registry|Document'].map(s=>{const[v,l]=s.split('|');return`<button class="ftab hf ${S.historyType===v?'on':''}" data-val="${v}">${l}</button>`;}).join('')}</div>
+    ${fi.length===0?`<div class="empty"><p style="font-size:40px">📜</p><p>कोई रिकॉर्ड नहीं</p></div>`:fi.map(t=>{
+      if(t._t==='registry'){const p=Number(t.profit||0);return`<div class="row"><div style="flex:1"><div style="display:flex;gap:6px;flex-wrap:wrap"><span style="font-weight:700">${t.clientName}</span>${bdg('#1D4ED8','📄')}</div><div class="rmeta"><span style="font-size:12px;color:#78716C">${t.docType} • ${fmtDate(t.docDate)}</span></div><div class="arow"><button class="ebtn reg-edit" data-id="${t.id}">✏️ Edit</button><button class="dbtn reg-del" data-id="${t.id}">🗑️ हटाएं</button></div></div><p style="font-weight:800;font-size:16px;color:${p>=0?'#16A34A':'#DC2626'};margin-left:8px">${p>=0?'+':'-'}${fmtAmt(Math.abs(p))}</p></div>`;}
+      if(t._t==='udhar'){const ig=t.type==='lena';return`<div class="row"><div style="flex:1"><div style="display:flex;gap:6px;flex-wrap:wrap"><span style="font-weight:700">${t.name}</span>${bdg('#FF6B00','उधार')}${t.settled?bdg('#16A34A','✅'):''}</div><div class="rmeta"><span style="font-size:12px;color:#78716C">${fmtDate(t.createdAt)}</span></div><div class="arow"><button class="ebtn su-edit" data-id="${t.id}">✏️ Edit</button><button class="dbtn su-del" data-id="${t.id}">🗑️ हटाएं</button></div></div><p style="font-weight:800;font-size:17px;color:${ig?'#16A34A':'#DC2626'};margin-left:8px">${fmtAmt(t.amount)}</p></div>`;}
+      const ig=t.dir==='in';return`<div class="row"><div style="flex:1"><div style="display:flex;gap:6px;flex-wrap:wrap"><span style="font-weight:700">${t.category}</span>${bdg('#D97706','खर्च')}</div><div class="rmeta"><span style="font-size:12px;color:#78716C">${fmtDate(t.createdAt)}</span></div><div class="arow"><button class="ebtn pkt-edit" data-id="${t.id}">✏️ Edit</button><button class="dbtn pkt-del" data-id="${t.id}">🗑️ हटाएं</button></div></div><p style="font-weight:800;font-size:17px;color:${ig?'#16A34A':'#DC2626'};margin-left:8px">${fmtAmt(t.amount)}</p></div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ── BACHAT (DAILY SAVING) ─────────────────────
+// Savings config stored in localStorage
+function getBachatConfig(){
+  try{const d=localStorage.getItem('mh_bachat_cfg_'+fbUID);return d?JSON.parse(d):{startDate:'2025-08-29',dailyTarget:200,accountName:'Aditya-Anagha Bachat',accountNo:'453'};}catch(e){return{startDate:'2025-08-29',dailyTarget:200,accountName:'Aditya-Anagha Bachat',accountNo:'453'};}
+}
+function saveBachatConfig(cfg){try{localStorage.setItem('mh_bachat_cfg_'+fbUID,JSON.stringify(cfg));}catch(e){}}
+
+async function saveBachatDeposit(dep){
+  dep.createdAt=dep.date;
+  const i=LS.bachat?LS.bachat.findIndex(x=>x.id===dep.id):-1;
+  if(!LS.bachat)LS.bachat=[];
+  if(i>=0)LS.bachat[i]=dep;else LS.bachat.unshift(dep);
+  try{localStorage.setItem('mh_'+fbUID+'_bachat',JSON.stringify(LS.bachat));}catch(e){}
+  await dbSet('bachat/'+dep.id,dep);
+  S.modal=null;mf={};render();toast('✅ बचत entry save हो गई!');
+}
+async function deleteBachatDeposit(id){
+  LS.bachat=(LS.bachat||[]).filter(x=>x.id!==id);
+  try{localStorage.setItem('mh_'+fbUID+'_bachat',JSON.stringify(LS.bachat));}catch(e){}
+  await dbDel('bachat/'+id);
+  render();toast('🗑️ Entry हटाई गई');
+}
+
+function pgBachat(){
+  const cfg=getBachatConfig();
+  if(!LS.bachat)LS.bachat=[];
+  const deps=[...LS.bachat].sort((a,b)=>b.date.localeCompare(a.date));
+
+  // Calculate expected vs actual
+  const startD=new Date(cfg.startDate);
+  const todayD=new Date(today());
+  const daysPassed=Math.max(0,Math.floor((todayD-startD)/(1000*60*60*24))+1);
+  const expectedTotal=daysPassed*cfg.dailyTarget;
+  const actualTotal=deps.reduce((s,d)=>s+Number(d.amount||0),0);
+  const diff=actualTotal-expectedTotal;
+  const daysBehind=diff<0?Math.floor(Math.abs(diff)/cfg.dailyTarget):0;
+  const daysAhead=diff>0?Math.floor(diff/cfg.dailyTarget):0;
+  const pct=expectedTotal>0?Math.min(100,Math.round((actualTotal/expectedTotal)*100)):0;
+
+  // Monthly view - group by month
+  const monthMap={};
+  deps.forEach(d=>{
+    const m=d.date.slice(0,7);
+    if(!monthMap[m])monthMap[m]={month:m,total:0,entries:[]};
+    monthMap[m].total+=Number(d.amount||0);
+    monthMap[m].entries.push(d);
+  });
+  const months=Object.values(monthMap).sort((a,b)=>b.month.localeCompare(a.month));
+
+  const fmtMonth=m=>{try{return new Date(m+'-01').toLocaleDateString('hi-IN',{month:'long',year:'numeric'});}catch(e){return m;}};
+
+  return `<div class="page px" style="padding-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 style="font-family:Georgia,serif">🏦 दैनिक बचत</h2>
+      <div style="display:flex;gap:6px">
+        <button class="btn bblue" style="padding:8px 12px;font-size:13px" id="bachat-cfg-btn">⚙️ Setting</button>
+        <button class="btn bg" style="padding:8px 12px;font-size:13px" id="add-bachat-btn">+ जमा</button>
+      </div>
+    </div>
+
+    <!-- Account Info -->
+    <div style="background:linear-gradient(135deg,#1D4ED8,#1E40AF);color:#fff;border-radius:16px;padding:16px;margin-bottom:14px">
+      <p style="font-size:12px;opacity:.8;margin-bottom:2px">${cfg.accountName} • खाता क्र. ${cfg.accountNo}</p>
+      <p style="font-size:12px;opacity:.8;margin-bottom:8px">शुरू: ${fmtDate(cfg.startDate)} • रोज: ${fmtAmt(cfg.dailyTarget)}</p>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end">
+        <div>
+          <p style="font-size:12px;opacity:.8">अभी जमा है</p>
+          <p style="font-size:32px;font-weight:800;font-family:Georgia,serif">${fmtAmt(actualTotal)}</p>
+        </div>
+        <div style="text-align:right">
+          <p style="font-size:12px;opacity:.8">${daysPassed} दिन में होना था</p>
+          <p style="font-size:22px;font-weight:800">${fmtAmt(expectedTotal)}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="card" style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-weight:700;font-size:14px">📊 प्रगति</span>
+        <span style="font-weight:800;font-size:16px;color:${diff>=0?'#16A34A':'#DC2626'}">${pct}%</span>
+      </div>
+      <div style="background:#FFE4C4;border-radius:20px;height:14px;overflow:hidden">
+        <div style="background:${diff>=0?'linear-gradient(90deg,#16A34A,#22C55E)':'linear-gradient(90deg,#DC2626,#EF4444)'};height:100%;width:${pct}%;border-radius:20px;transition:.5s"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:10px">
+        <div class="sb ${diff>=0?'sg':'sr'}" style="flex:1;margin-right:8px;padding:10px">
+          <p style="font-size:12px;color:${diff>=0?'#16A34A':'#DC2626'};font-weight:700">${diff>=0?'📈 आगे हैं':'📉 पीछे हैं'}</p>
+          <p style="font-weight:800;font-size:18px;color:${diff>=0?'#16A34A':'#DC2626'}">${fmtAmt(Math.abs(diff))}</p>
+          <p style="font-size:11px;color:#78716C">${diff>=0?daysAhead+' दिन आगे':daysBehind+' दिन पीछे'}</p>
+        </div>
+        <div class="sb sbl" style="flex:1;padding:10px">
+          <p style="font-size:12px;color:#1D4ED8;font-weight:700">📅 कुल दिन</p>
+          <p style="font-weight:800;font-size:18px;color:#1D4ED8">${daysPassed}</p>
+          <p style="font-size:11px;color:#78716C">${fmtDate(cfg.startDate)} से</p>
+        </div>
+      </div>
+
+      <!-- Catch-up tip -->
+      ${diff<0?`<div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:12px;padding:12px;margin-top:10px">
+        <p style="font-size:13px;color:#C2410C;font-weight:700">💡 बराबरी के लिए:</p>
+        <p style="font-size:13px;color:#92400E;margin-top:4px">आज ${fmtAmt(Math.abs(diff))} एक बार में जमा करें, <br>या अगले ${daysBehind} दिन रोज ${fmtAmt(cfg.dailyTarget*2)} जमा करें</p>
+      </div>`:'<div style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:12px;padding:12px;margin-top:10px"><p style="font-size:13px;color:#15803D;font-weight:700">🎉 बहुत बढ़िया! आप target से आगे हैं!</p></div>'}
+    </div>
+
+    <!-- Monthly Summary + Entries -->
+    ${months.length===0?`<div class="empty"><p style="font-size:40px">🏦</p><p>अभी कोई जमा नहीं है</p><p style="font-size:13px;margin-top:8px">ऊपर "+ जमा" button से entry जोड़ें</p></div>`:
+      months.map(mo=>`
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <p style="font-weight:700;font-size:15px">${fmtMonth(mo.month)}</p>
+            <div style="text-align:right">
+              <p style="font-weight:800;color:#16A34A">${fmtAmt(mo.total)}</p>
+              <p style="font-size:11px;color:#78716C">${mo.entries.length} बार जमा</p>
+            </div>
+          </div>
+          ${mo.entries.map(d=>`
+            <div class="row">
+              <div style="flex:1">
+                <p style="font-weight:700">💰 ${fmtAmt(d.amount)}</p>
+                <div class="rmeta">
+                  <span style="font-size:11px;color:#78716C">📅 ${fmtDate(d.date)}</span>
+                  <span style="font-size:11px;background:${d.mode==='cash'?'#16A34A20':'#0EA5E920'};color:${d.mode==='cash'?'#16A34A':'#0EA5E9'};padding:1px 6px;border-radius:8px">${d.mode==='cash'?'💵 Cash':'📱 Online'}</span>
+                  <span style="font-size:11px;background:#1D4ED820;color:#1D4ED8;padding:1px 6px;border-radius:8px">≈ ${Math.round(d.amount/cfg.dailyTarget)} दिन</span>
+                </div>
+                ${d.note?`<p style="font-size:11px;color:#78716C;margin-top:2px">${d.note}</p>`:''}
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;margin-left:8px">
+                <button class="ebtn bac-edit" data-id="${d.id}">✏️</button>
+                <button class="dbtn bac-del" data-id="${d.id}">🗑️</button>
+              </div>
+            </div>`).join('')}
+        </div>`).join('')}
+
+    <!-- All-time Stats -->
+    <div class="card" style="margin-bottom:14px">
+      <p style="font-weight:700;margin-bottom:10px">📊 पूरा हिसाब</p>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #FFE4C4"><span style="color:#78716C">खाता शुरू</span><span style="font-weight:600">${fmtDate(cfg.startDate)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #FFE4C4"><span style="color:#78716C">कुल दिन बीते</span><span style="font-weight:600">${daysPassed} दिन</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #FFE4C4"><span style="color:#78716C">रोज का लक्ष्य</span><span style="font-weight:600">${fmtAmt(cfg.dailyTarget)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #FFE4C4"><span style="color:#78716C">अब तक होना था</span><span style="font-weight:700;color:#1D4ED8">${fmtAmt(expectedTotal)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #FFE4C4"><span style="color:#78716C">अब तक जमा किया</span><span style="font-weight:700;color:#16A34A">${fmtAmt(actualTotal)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #FFE4C4"><span style="color:#78716C">कुल जमा बार</span><span style="font-weight:600">${deps.length} बार</span></div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0"><span style="font-weight:700">${diff>=0?'📈 आगे':'📉 पीछे'}</span><span style="font-weight:800;font-size:16px;color:${diff>=0?'#16A34A':'#DC2626'}">${fmtAmt(Math.abs(diff))}</span></div>
+    </div>
+  </div>`;
+}
+
+// ── SETTINGS ──────────────────────────────
+function pgSettings(){
+  const curOpt=AUTOLOCK_OPTIONS.find(o=>o.val===autoLockSeconds)||AUTOLOCK_OPTIONS[4];
+  return `<div class="page px" style="padding-top:16px">
+    <h2 style="font-family:Georgia,serif;margin-bottom:20px">⚙️ Settings</h2>
+
+    <div class="card">
+      <p style="font-weight:700;font-size:16px;margin-bottom:4px">🔒 Auto-Lock</p>
+      <p style="font-size:13px;color:#78716C;margin-bottom:16px">कितनी देर बाद app खुद lock हो जाए?</p>
+      ${AUTOLOCK_OPTIONS.map(o=>`
+        <div class="settings-row" style="cursor:pointer" onclick="window.__setAutoLock(${o.val})">
+          <div>
+            <p class="settings-label">${o.label}</p>
+            ${o.val===0?'<p class="settings-sub">App कभी lock नहीं होगा</p>':o.val<=120?`<p class="settings-sub">कम समय — ज्यादा सुरक्षित</p>`:''}
+          </div>
+          <span style="font-size:20px">${o.val===autoLockSeconds?'🟠':'⚪'}</span>
+        </div>`).join('')}
+    </div>
+
+    <div class="card">
+      <p style="font-weight:700;font-size:16px;margin-bottom:4px">🔑 PIN बदलें</p>
+      <p style="font-size:13px;color:#78716C;margin-bottom:12px">अपना PIN बदलना चाहते हैं?</p>
+      <button class="btn bp" onclick="window.__changePinFromSettings()">🔑 PIN बदलें</button>
+    </div>
+
+    <div class="card">
+      <p style="font-weight:700;font-size:16px;margin-bottom:4px">👤 Account</p>
+      <p style="font-size:13px;color:#78716C;margin-bottom:4px">Email: <b>${currentUser?.email||''}</b></p>
+      <p style="font-size:13px;color:#78716C;margin-bottom:12px">नाम: <b>${currentUser?.displayName||''}</b></p>
+      <button class="btn br" onclick="window.__logoutFromSettings()">🚪 Logout करें</button>
+    </div>
+  </div>`;
+}
+
+window.__setAutoLock=function(val){saveAutoLockSetting(val);resetAutoLockTimer();render();toast(val===0?'Auto-lock बंद किया':'Auto-lock: '+AUTOLOCK_OPTIONS.find(o=>o.val===val)?.label);};
+window.__changePinFromSettings=function(){if(confirm('PIN बदलें?')){localStorage.removeItem(PIN_KEY());lockApp();}};
+window.__logoutFromSettings=async function(){if(confirm('Logout करें?')){dbListeners.forEach(({r,fn})=>off(r,fn));appUnlocked=false;await signOut(auth);}};
+window.__lockNav=function(){lockApp();};
+
+// ── MODAL ────────────────────────────────
+function buildModal(){
+  if(!S.modal)return '';let title='',body='';const f=mf;
+  const isEdit=!!f.editId;
+
+  if(S.modal==='udhar'){
+    const eu=isEdit?LS.udhars.find(x=>x.id===f.editId):null;
+    title=isEdit?'✏️ उधार Edit करें':'📒 नया उधार जोड़ें';
+    body=`<label class="fl">👤 व्यक्ति का नाम *</label><input class="fi" id="mn" placeholder="जैसे: राम भाऊ" value="${eu?.name||f.name||''}"/>
+    <label class="fl">💰 रकम (₹) *</label><input class="fi" id="ma" type="number" placeholder="0" value="${eu?.amount||f.amount||''}"/>
+    <label class="fl">📋 प्रकार</label><select class="fi" id="mt"><option value="lena" ${(eu?.type||f.type||'lena')==='lena'?'selected':''}>मुझे लेना है</option><option value="dena" ${(eu?.type||f.type)==='dena'?'selected':''}>मुझे देना है</option></select>
+    <label class="fl">💳 माध्यम</label><select class="fi" id="mm"><option value="cash" ${(eu?.mode||'cash')==='cash'?'selected':''}>नकद (Cash)</option><option value="online" ${eu?.mode==='online'?'selected':''}>ऑनलाइन (UPI)</option></select>
+    <label class="fl">📱 सेवा</label><select class="fi" id="ms"><option value="general" ${(eu?.service||'general')==='general'?'selected':''}>सामान्य</option><option value="jio" ${eu?.service==='jio'?'selected':''}>Jio</option><option value="airtel" ${eu?.service==='airtel'?'selected':''}>Airtel</option><option value="vi" ${eu?.service==='vi'?'selected':''}>Vi</option><option value="bsnl" ${eu?.service==='bsnl'?'selected':''}>BSNL</option><option value="other" ${eu?.service==='other'?'selected':''}>अन्य</option></select>
+    <label class="fl">📅 तारीख</label><input class="fi" id="md" type="date" value="${eu?.createdAt||eu?.date||f.date||today()}"/>
+    <label class="fl">⏰ वापसी की तारीख</label><input class="fi" id="mdu" type="date" value="${eu?.dueDate||f.dueDate||''}"/>
+    <label class="fl">📝 नोट</label><input class="fi" id="mno" placeholder="कुछ जरूरी बात..." value="${eu?.note||f.note||''}"/>
+    <button class="btn bp bfw" id="btn-su">✅ ${isEdit?'Update करें':'Save करें'}</button>`;
+  }
+  else if(S.modal==='pocket'||S.modal==='income'){
+    const ep=isEdit?LS.pocket.find(x=>x.id===f.editId):null;
+    const isI=S.modal==='income'||(ep?.dir==='in');
+    title=ep?(ep.dir==='in'?'✏️ आमदनी Edit':'✏️ खर्च Edit'):isI?'💰 आमदनी जोड़ें':'💸 खर्च जोड़ें';
+    const dir=ep?.dir||f.dir||(isI?'in':'out');
+    const cats=dir==='in'?['दुकान कमाई','उधार वापसी','मजदूरी','Registry/Document','अन्य आमदनी']:['खाना-सब्जी','यातायात','दुकान खर्च','मोबाइल/Recharge','बिल','कपड़े','दवाई','मनोरंजन','अन्य'];
+    body=`<div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="dib" data-dir="in" style="flex:1;padding:10px 0;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;border:2px solid #16A34A;background:${dir==='in'?'#16A34A':'transparent'};color:${dir==='in'?'#fff':'#16A34A'}">💰 आमदनी</button>
+      <button class="dib" data-dir="out" style="flex:1;padding:10px 0;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;border:2px solid #DC2626;background:${dir==='out'?'#DC2626':'transparent'};color:${dir==='out'?'#fff':'#DC2626'}">💸 खर्च</button>
+    </div>
+    <label class="fl">💰 रकम (₹) *</label><input class="fi" id="pa" type="number" placeholder="0" value="${ep?.amount||f.amount||''}"/>
+    <label class="fl">📂 श्रेणी</label><select class="fi" id="pc">${cats.map(c=>`<option ${ep?.category===c?'selected':''}>${c}</option>`).join('')}</select>
+    <label class="fl">💳 माध्यम</label><select class="fi" id="pm"><option value="cash" ${(ep?.mode||'cash')==='cash'?'selected':''}>नकद (Cash)</option><option value="online" ${ep?.mode==='online'?'selected':''}>ऑनलाइन (UPI)</option></select>
+    <label class="fl">📅 तारीख</label><input class="fi" id="pda" type="date" value="${ep?.date||f.date||today()}"/>
+    <label class="fl">📝 नोट</label><input class="fi" id="pno" placeholder="किसलिए?" value="${ep?.note||f.note||''}"/>
+    <input type="hidden" id="pdir" value="${dir}"/>
+    <button class="btn bp bfw" id="btn-sp">✅ ${isEdit?'Update करें':'Save करें'}</button>`;
+  }
+  else if(S.modal==='settle'&&S.settleItem){
+    const u=S.settleItem;const mode=f.sm||'full';title='✅ चुकता करें';
+    body=`<div style="background:#FFF8F0;border-radius:12px;padding:14px;margin-bottom:14px"><p style="font-weight:700;font-size:16px">${u.name}</p><p style="color:#78716C;margin-top:4px">${fmtAmt(u.amount)} • ${u.type==='lena'?'आपको मिलना था':'आपको देना था'}</p></div>
+    <div style="display:flex;gap:8px;margin-bottom:12px"><button class="smb" data-mode="full" style="flex:1;padding:10px 0;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;border:2px solid #FF6B00;background:${mode==='full'?'#FF6B00':'transparent'};color:${mode==='full'?'#fff':'#FF6B00'}">पूरा चुकता</button><button class="smb" data-mode="partial" style="flex:1;padding:10px 0;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;border:2px solid #FF6B00;background:${mode==='partial'?'#FF6B00':'transparent'};color:${mode==='partial'?'#fff':'#FF6B00'}">आंशिक</button></div>
+    ${mode==='partial'?`<label class="fl">कितना मिला/दिया? (₹)</label><input class="fi" id="sa" type="number" placeholder="0"/>`:''}
+    <button class="btn bg bfw" id="btn-cs">✅ चुकता करें</button>`;
+  }
+  else if(S.modal==='registry'){
+    const er=f.editReg||{};title=er.id?'✏️ Document Edit':'📄 नया Document';
+    body=`<label class="fl">👤 Client का नाम *</label><input class="fi" id="rc-name" placeholder="जैसे: श्री रामलाल वर्मा" value="${er.clientName||''}"/>
+    <label class="fl">📱 Mobile</label><input class="fi" id="rc-mobile" type="tel" placeholder="Client का mobile" value="${er.clientMobile||''}"/>
+    <label class="fl">🏠 पता</label><input class="fi" id="rc-addr" placeholder="Client का पता" value="${er.clientAddress||''}"/>
+    <label class="fl">📝 Document प्रकार</label>
+    <select class="fi" id="rc-dtype"><option>जमीन बिक्री पत्र (Sale Deed)</option><option>मकान बिक्री पत्र</option><option>Gift Deed (दान पत्र)</option><option>Power of Attorney</option><option>Agreement / करार नामा</option><option>Lease Deed (पट्टा)</option><option>Affidavit (शपथ पत्र)</option><option>Will (वसीयत)</option><option>Partition Deed (बंटवारा)</option><option>Mortgage (बंधक)</option><option>अन्य</option></select>
+    <label class="fl">📋 Property / विवरण</label><textarea class="fi" id="rc-desc" placeholder="खसरा नंबर, क्षेत्रफल, स्थान...">${er.propertyDesc||''}</textarea>
+    <label class="fl">📅 तारीख</label><input class="fi" id="rc-date" type="date" value="${er.docDate||today()}"/>
+    <label class="fl">📌 Registration नंबर</label><input class="fi" id="rc-regnum" placeholder="Registry number" value="${er.regNumber||''}"/>
+    <label class="fl">📌 Status</label>
+    <select class="fi" id="rc-status"><option value="pending" ${(er.status||'pending')==='pending'?'selected':''}>⏳ Pending</option><option value="registered" ${er.status==='registered'?'selected':''}>📋 Registered</option><option value="complete" ${er.status==='complete'?'selected':''}>✅ Complete</option></select>
+    <label class="fl">📁 Final Copy</label>
+    <select class="fi" id="rc-copy"><option value="0" ${!er.finalCopyGiven?'selected':''}>❌ नहीं दी</option><option value="1" ${er.finalCopyGiven?'selected':''}>✅ दे दी</option></select>
+    <label class="fl">📝 नोट</label><textarea class="fi" id="rc-notes" placeholder="कोई और जानकारी...">${er.notes||''}</textarea>
+    <p style="font-size:12px;color:#78716C;margin-top:10px;background:#EFF6FF;padding:8px;border-radius:8px">💡 Payments और Expenses save के बाद अलग से जोड़ें</p>
+    <button class="btn bblue bfw" id="btn-sreg">✅ ${er.id?'Update करें':'Document Save करें'}</button>`;
+  }
+  else if(S.modal==='add-payment'){
+    const r=LS.registry.find(x=>x.id===f.regId);
+    title='💰 Payment जोड़ें';
+    body=`<div style="background:#EFF6FF;border-radius:10px;padding:10px;margin-bottom:14px"><p style="font-weight:700;color:#1E40AF">${r?.clientName}</p><p style="font-size:12px;color:#78716C">अब तक मिला: ${fmtAmt(r?.totalReceived||0)}</p></div>
+    <label class="fl">💰 रकम (₹) *</label><input class="fi" id="pm-amt" type="number" placeholder="0"/>
+    <label class="fl">📅 तारीख *</label><input class="fi" id="pm-date" type="date" value="${today()}"/>
+    <label class="fl">📝 नोट</label><input class="fi" id="pm-note" placeholder="जैसे: advance, final payment"/>
+    <button class="btn bg bfw" id="btn-add-payment">✅ Payment जोड़ें</button>`;
+  }
+  else if(S.modal==='add-expense'){
+    const r=LS.registry.find(x=>x.id===f.regId);
+    title='🧾 खर्चा जोड़ें';
+    body=`<div style="background:#FEF2F2;border-radius:10px;padding:10px;margin-bottom:14px"><p style="font-weight:700;color:#DC2626">${r?.clientName}</p><p style="font-size:12px;color:#78716C">अब तक खर्च: ${fmtAmt(r?.totalCost||0)}</p></div>
+    <label class="fl">📋 प्रकार *</label>
+    <select class="fi" id="ex-type"><option>Typing</option><option>Challan</option><option>Paging</option><option>Data Entry</option><option>Reg Office</option><option>Ajay Bhaiya</option><option>अन्य खर्चा</option></select>
+    <label class="fl">💰 रकम (₹) *</label><input class="fi" id="ex-amt" type="number" placeholder="0"/>
+    <label class="fl">📅 तारीख *</label><input class="fi" id="ex-date" type="date" value="${today()}"/>
+    <label class="fl">📝 नोट (किसे दिया?)</label><input class="fi" id="ex-note" placeholder="जैसे: सुरेश जी को typing fee दी"/>
+    <button class="btn br bfw" id="btn-add-expense">✅ खर्चा जोड़ें</button>`;
+  }
+  else if(S.modal==='bachat-deposit'){
+    const cfg=getBachatConfig();
+    const ed=mf.editId?LS.bachat?.find(x=>x.id===mf.editId):null;
+    title=ed?'✏️ जमा Edit करें':'💰 बचत जमा करें';
+    body=`<div style="background:#EFF6FF;border-radius:10px;padding:12px;margin-bottom:14px">
+      <p style="font-weight:700;color:#1E40AF">${cfg.accountName}</p>
+      <p style="font-size:12px;color:#78716C">रोज का लक्ष्य: ${fmtAmt(cfg.dailyTarget)} • खाता क्र: ${cfg.accountNo}</p>
+    </div>
+    <label class="fl">💰 जमा की रकम (₹) *</label>
+    <input class="fi" id="bac-amt" type="number" placeholder="जैसे: 200, 1000, 2000" value="${ed?.amount||''}"/>
+    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap" id="bac-quick">
+      ${[200,400,600,1000,2000,3000].map(a=>`<button onclick="document.getElementById('bac-amt').value=${a}" style="background:#EFF6FF;color:#1D4ED8;border:1.5px solid #BFDBFE;border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer">${fmtAmt(a)}</button>`).join('')}
+    </div>
+    <label class="fl">📅 तारीख *</label>
+    <input class="fi" id="bac-date" type="date" value="${ed?.date||today()}"/>
+    <label class="fl">💳 माध्यम</label>
+    <select class="fi" id="bac-mode">
+      <option value="cash" ${(ed?.mode||'cash')==='cash'?'selected':''}>💵 नकद (Cash)</option>
+      <option value="online" ${ed?.mode==='online'?'selected':''}>📱 ऑनलाइन (UPI/Transfer)</option>
+    </select>
+    <label class="fl">📝 नोट (वैकल्पिक)</label>
+    <input class="fi" id="bac-note" placeholder="जैसे: collection wale ko diya" value="${ed?.note||''}"/>
+    <button class="btn bblue bfw" id="btn-sbac">✅ ${ed?'Update करें':'जमा Save करें'}</button>`;
+  }
+  else if(S.modal==='bachat-config'){
+    const cfg=getBachatConfig();
+    title='⚙️ बचत Account Setting';
+    body=`<label class="fl">🏦 Account / Society का नाम</label>
+    <input class="fi" id="bcfg-name" value="${cfg.accountName}" placeholder="जैसे: Aditya-Anagha Bachat"/>
+    <label class="fl">🔢 खाता नंबर</label>
+    <input class="fi" id="bcfg-no" value="${cfg.accountNo}" placeholder="खाता क्रमांक"/>
+    <label class="fl">📅 खाता शुरू होने की तारीख</label>
+    <input class="fi" id="bcfg-start" type="date" value="${cfg.startDate}"/>
+    <label class="fl">💰 रोज का लक्ष्य (₹)</label>
+    <input class="fi" id="bcfg-target" type="number" value="${cfg.dailyTarget}" placeholder="200"/>
+    <p style="font-size:12px;color:#78716C;margin-top:10px;background:#EFF6FF;padding:8px;border-radius:8px">💡 यह setting आपके phone में save होगी</p>
+    <button class="btn bblue bfw" id="btn-bcfg">✅ Setting Save करें</button>`;
+  }
+    title='🔔 नया रिमाइंडर';
+    body=`<label class="fl">📝 किसलिए?</label><input class="fi" id="rn" placeholder="जैसे: बिजली बिल, Registry याद"/>
+    <label class="fl">💰 रकम (वैकल्पिक)</label><input class="fi" id="ra" type="number" placeholder="0"/>
+    <label class="fl">📅 तारीख</label><input class="fi" id="rd" type="date"/>
+    <label class="fl">📝 नोट</label><input class="fi" id="rno" placeholder="कुछ जरूरी बात..."/>
+    <button class="btn bp bfw" id="btn-arem">🔔 जोड़ें</button>`;
+  }
+
+  return `<div class="mov" id="mov"><div class="mbox"><div class="mhdr"><h3 style="font-family:Georgia,serif;font-size:19px">${title}</h3><button class="mcls" id="cm">✕</button></div>${body}</div></div>`;
+}
+
+function nav(){return`<div class="bnav">${[['dashboard','🏠','होम'],['udhar','📒','उधार'],['pocket','👛','जेब'],['bachat','🏦','बचत'],['registry','📄','Registry']].map(([t,ic,lb])=>`<button class="nb ${S.tab===t?'on':''}" data-tab="${t}"><span class="ni">${ic}</span>${lb}</button>`).join('')}</div>`;}
+
+// ── EVENTS ───────────────────────────────
+function attach(){
+  document.querySelectorAll('.nb').forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;mf={};render();});
+  const lb=g('lock-btn');if(lb)lb.onclick=()=>lockApp();
+  const mov=g('mov');if(mov)mov.onclick=e=>{if(e.target===mov){S.modal=null;mf={};render();}};
+  const cm=g('cm');if(cm)cm.onclick=()=>{S.modal=null;mf={};render();};
+  document.querySelectorAll('.qab').forEach(b=>b.onclick=()=>{S.modal=b.dataset.a;mf={dir:b.dataset.a==='income'?'in':'out'};render();});
+  document.querySelectorAll('.dib').forEach(b=>b.onclick=()=>{mf.dir=b.dataset.dir;mf.category='';render();});
+  document.querySelectorAll('.smb').forEach(b=>b.onclick=()=>{mf.sm=b.dataset.mode;render();});
+
+  // Udhar
+  document.querySelectorAll('.aub-btn').forEach(b=>b.onclick=()=>{S.modal='udhar';mf={};render();});
+  const us=g('us');if(us)us.oninput=e=>{S.udharSearch=e.target.value;render();};
+  document.querySelectorAll('.uf').forEach(b=>b.onclick=()=>{S.udharFilter=b.dataset.val;render();});
+  document.querySelectorAll('.expand-person').forEach(b=>b.onclick=()=>{const k=b.dataset.key;S.expandedPerson=S.expandedPerson===k?null:k;render();});
+  document.querySelectorAll('.add-udhar-person').forEach(b=>b.onclick=()=>{S.modal='udhar';mf={name:b.dataset.name};render();});
+  document.querySelectorAll('.su-settle').forEach(b=>b.onclick=()=>{const u=LS.udhars.find(x=>x.id==b.dataset.id);if(u){S.settleItem=u;S.modal='settle';mf={};render();}});
+  document.querySelectorAll('.su-edit').forEach(b=>b.onclick=()=>{S.modal='udhar';mf={editId:b.dataset.id};render();});
+  document.querySelectorAll('.su-share').forEach(b=>b.onclick=()=>shareU(b.dataset.id));
+  document.querySelectorAll('.su-del').forEach(b=>b.onclick=()=>{const u=LS.udhars.find(x=>x.id==b.dataset.id);if(!u)return;showConfirm('उधार हटाएं?',`"${u.name}" का ${fmtAmt(u.amount)} वाला उधार हमेशा के लिए मिट जाएगा!`,()=>deleteUdhar(b.dataset.id));});
+  document.querySelectorAll('.settle-all-btn').forEach(b=>b.onclick=async()=>{const key=b.dataset.key;const txns=LS.udhars.filter(u=>!u.settled&&(u.personKey||u.name.toLowerCase())===key);showConfirm('सब चुकता करें?',`${txns.length} उधार एक साथ चुकता होंगे।`,async()=>{for(const u of txns)await settleUdhar(u.id);});});
+
+  // Pocket
+  document.querySelectorAll('.apb-btn').forEach(b=>b.onclick=()=>{S.modal='pocket';mf={dir:'out'};render();});
+  document.querySelectorAll('.aib-btn').forEach(b=>b.onclick=()=>{S.modal='income';mf={dir:'in'};render();});
+  const pd=g('pd');if(pd)pd.onchange=e=>{S.pocketDate=e.target.value;render();};
+  document.querySelectorAll('.pkt-edit').forEach(b=>b.onclick=()=>{const p=LS.pocket.find(x=>x.id==b.dataset.id);if(p){S.modal=p.dir==='in'?'income':'pocket';mf={editId:b.dataset.id};render();}});
+  document.querySelectorAll('.pkt-del').forEach(b=>b.onclick=()=>{const p=LS.pocket.find(x=>x.id==b.dataset.id);if(!p)return;showConfirm('खर्च/आमदनी हटाएं?',`${p.category} - ${fmtAmt(p.amount)} हमेशा के लिए मिट जाएगा!`,()=>deletePocket(b.dataset.id));});
+
+  // Registry
+  document.querySelectorAll('.areg-btn').forEach(b=>b.onclick=()=>{S.modal='registry';mf={};render();});
+  const rs=g('regsrch');if(rs)rs.oninput=e=>{S.regSearch=e.target.value;render();};
+  document.querySelectorAll('.rf').forEach(b=>b.onclick=()=>{S.regFilter=b.dataset.val;render();});
+  document.querySelectorAll('.reg-edit').forEach(b=>b.onclick=()=>{const r=LS.registry.find(x=>x.id==b.dataset.id);if(r){S.modal='registry';mf={editReg:r};render();}});
+  document.querySelectorAll('.reg-share').forEach(b=>b.onclick=()=>shareReg(b.dataset.id));
+  document.querySelectorAll('.reg-del').forEach(b=>b.onclick=()=>{const r=LS.registry.find(x=>x.id==b.dataset.id);if(!r)return;showConfirm('Document हटाएं?',`"${r.clientName}" का पूरा document record हमेशा के लिए मिट जाएगा!`,()=>deleteReg(b.dataset.id));});
+  document.querySelectorAll('.reg-done').forEach(b=>b.onclick=async()=>{const r=LS.registry.find(x=>x.id==b.dataset.id);if(!r)return;const upd={...r,status:'complete'};const i=LS.registry.findIndex(x=>x.id===r.id);if(i>=0)LS.registry[i]=upd;lsSave('registry');await dbSet('registry/'+r.id,upd);render();toast('✅ Document पूर्ण!');});
+  document.querySelectorAll('.reg-copy').forEach(b=>b.onclick=async()=>{const r=LS.registry.find(x=>x.id==b.dataset.id);if(!r)return;const upd={...r,finalCopyGiven:true};const i=LS.registry.findIndex(x=>x.id===r.id);if(i>=0)LS.registry[i]=upd;lsSave('registry');await dbSet('registry/'+r.id,upd);render();toast('📁 Final Copy marked!');});
+  document.querySelectorAll('.add-reg-payment').forEach(b=>b.onclick=()=>{S.modal='add-payment';mf={regId:b.dataset.id};render();});
+  document.querySelectorAll('.add-reg-expense').forEach(b=>b.onclick=()=>{S.modal='add-expense';mf={regId:b.dataset.id};render();});
+  document.querySelectorAll('.del-reg-pmt').forEach(b=>b.onclick=()=>{showConfirm('Payment हटाएं?','यह payment हमेशा के लिए मिट जाएगी!',()=>deleteRegPayment(b.dataset.regid,b.dataset.pmtid));});
+  document.querySelectorAll('.del-reg-exp').forEach(b=>b.onclick=()=>{showConfirm('खर्चा हटाएं?','यह खर्चा हमेशा के लिए मिट जाएगा!',()=>deleteRegExpense(b.dataset.regid,b.dataset.expid));});
+
+  // History
+  document.querySelectorAll('.hf').forEach(b=>b.onclick=()=>{S.historyType=b.dataset.val;render();});
+
+  // ── SAVE BUTTONS ──
+  const btnSU=g('btn-su');
+  if(btnSU)btnSU.onclick=async()=>{
+    const name=(g('mn')||{}).value?.trim()||'';const amount=Number((g('ma')||{}).value)||0;
+    if(!name){toast('⚠️ नाम भरें!');return;}if(!amount){toast('⚠️ रकम भरें!');return;}
+    btnSU.textContent='⏳...';btnSU.disabled=true;
+    const eu=mf.editId?LS.udhars.find(x=>x.id===mf.editId):null;
+    await saveUdhar({id:eu?.id||uid(),name,amount,type:(g('mt')||{}).value||'lena',mode:(g('mm')||{}).value||'cash',service:(g('ms')||{}).value||'general',createdAt:eu?.createdAt||(g('md')||{}).value||today(),date:(g('md')||{}).value||today(),dueDate:(g('mdu')||{}).value||'',note:(g('mno')||{}).value?.trim()||'',settled:eu?.settled||false,settledDate:eu?.settledDate||null});
+  };
+
+  const btnSP=g('btn-sp');
+  if(btnSP)btnSP.onclick=async()=>{
+    const amount=Number((g('pa')||{}).value)||0;if(!amount){toast('⚠️ रकम भरें!');return;}
+    const dir=(g('pdir')||{}).value||'out';btnSP.textContent='⏳...';btnSP.disabled=true;
+    const ep=mf.editId?LS.pocket.find(x=>x.id===mf.editId):null;
+    await savePocket({id:ep?.id||uid(),amount,dir,category:(g('pc')||{}).value||'अन्य',mode:(g('pm')||{}).value||'cash',date:(g('pda')||{}).value||today(),note:(g('pno')||{}).value?.trim()||''});
+  };
+
+  const btnCS=g('btn-cs');
+  if(btnCS)btnCS.onclick=async()=>{const mode=mf.sm||'full';if(mode==='partial'&&!Number((g('sa')||{}).value)){toast('⚠️ रकम भरें!');return;}btnCS.textContent='⏳...';btnCS.disabled=true;await settleUdhar(S.settleItem.id);};
+
+  const btnSR=g('btn-sreg');
+  if(btnSR)btnSR.onclick=async()=>{
+    const clientName=(g('rc-name')||{}).value?.trim()||'';
+    if(!clientName){toast('⚠️ Client का नाम भरें!');return;}
+    btnSR.textContent='⏳...';btnSR.disabled=true;
+    const er=mf.editReg||{};
+    await saveReg({id:er.id||uid(),clientName,clientMobile:(g('rc-mobile')||{}).value?.trim()||'',clientAddress:(g('rc-addr')||{}).value?.trim()||'',docType:(g('rc-dtype')||{}).value||'अन्य',propertyDesc:(g('rc-desc')||{}).value?.trim()||'',docDate:(g('rc-date')||{}).value||today(),regNumber:(g('rc-regnum')||{}).value?.trim()||'',status:(g('rc-status')||{}).value||'pending',finalCopyGiven:(g('rc-copy')||{}).value==='1',notes:(g('rc-notes')||{}).value?.trim()||'',payments:er.payments||[],expenses:er.expenses||[],createdAt:er.createdAt||(g('rc-date')||{}).value||today()});
+  };
+
+  const btnAP=g('btn-add-payment');
+  if(btnAP)btnAP.onclick=async()=>{const amount=Number((g('pm-amt')||{}).value)||0;const date=(g('pm-date')||{}).value||today();if(!amount){toast('⚠️ रकम भरें!');return;}btnAP.textContent='⏳...';btnAP.disabled=true;await addRegPayment(mf.regId,{id:uid(),amount,date,note:(g('pm-note')||{}).value?.trim()||''});};
+
+  const btnAE=g('btn-add-expense');
+  if(btnAE)btnAE.onclick=async()=>{const amount=Number((g('ex-amt')||{}).value)||0;const date=(g('ex-date')||{}).value||today();if(!amount){toast('⚠️ रकम भरें!');return;}btnAE.textContent='⏳...';btnAE.disabled=true;await addRegExpense(mf.regId,{id:uid(),type:(g('ex-type')||{}).value||'अन्य',amount,date,note:(g('ex-note')||{}).value?.trim()||''});};
+
+  // Bachat
+  const addBachatBtn=g('add-bachat-btn');if(addBachatBtn)addBachatBtn.onclick=()=>{S.modal='bachat-deposit';mf={};render();};
+  const bachatCfgBtn=g('bachat-cfg-btn');if(bachatCfgBtn)bachatCfgBtn.onclick=()=>{S.modal='bachat-config';mf={};render();};
+  document.querySelectorAll('.bac-edit').forEach(b=>b.onclick=()=>{S.modal='bachat-deposit';mf={editId:b.dataset.id};render();});
+  document.querySelectorAll('.bac-del').forEach(b=>b.onclick=()=>{const d=LS.bachat?.find(x=>x.id==b.dataset.id);if(!d)return;showConfirm('जमा entry हटाएं?',`${fmtDate(d.date)} की ${fmtAmt(d.amount)} वाली entry हमेशा के लिए मिट जाएगी!`,()=>deleteBachatDeposit(b.dataset.id));});
+
+  const btnSBac=g('btn-sbac');
+  if(btnSBac)btnSBac.onclick=async()=>{
+    const amount=Number((g('bac-amt')||{}).value)||0;
+    const date=(g('bac-date')||{}).value||today();
+    if(!amount){toast('⚠️ रकम भरें!');return;}
+    btnSBac.textContent='⏳...';btnSBac.disabled=true;
+    const ed=mf.editId?LS.bachat?.find(x=>x.id===mf.editId):null;
+    await saveBachatDeposit({id:ed?.id||uid(),amount,date,mode:(g('bac-mode')||{}).value||'cash',note:(g('bac-note')||{}).value?.trim()||''});
+  };
+
+  const btnBcfg=g('btn-bcfg');
+  if(btnBcfg)btnBcfg.onclick=()=>{
+    const cfg={accountName:(g('bcfg-name')||{}).value?.trim()||'Bachat',accountNo:(g('bcfg-no')||{}).value?.trim()||'',startDate:(g('bcfg-start')||{}).value||today(),dailyTarget:Number((g('bcfg-target')||{}).value)||200};
+    saveBachatConfig(cfg);S.modal=null;mf={};render();toast('✅ Setting save हो गई!');
+  };
+  if(btnArem)btnArem.onclick=async()=>{const name=(g('rn')||{}).value?.trim()||'';const dd=(g('rd')||{}).value||'';if(!name||!dd){toast('⚠️ नाम और तारीख भरें!');return;}await saveRem({id:uid(),name,amount:Number((g('ra')||{}).value)||0,dueDate:dd,note:(g('rno')||{}).value?.trim()||'',done:false});};
+}
+</script>
+</body>
+</html>
